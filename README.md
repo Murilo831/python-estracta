@@ -19,7 +19,7 @@ A <strong>tabela exibe dados fictícios gerados dinamicamente</strong> com a aju
 ## Dicas do projeto
 - [x] 1. Framwork Flask
 - [x] 2. Listagem Paginada (start, limit, sort e dir)
-- [] 3. Endpoint documentado com referencia o Swagger
+- [x] 3. Endpoint documentado com referencia o Swagger
 
 ## Tecnologias usadas
 

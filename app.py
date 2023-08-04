@@ -1,4 +1,5 @@
 from flasgger import Swagger
+from flasgger import swag_from
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -42,6 +43,48 @@ empresas = [
 
 #Endpoint para cadastrar uma nova empresa
 @app.route('/empresas/', methods=['POST'])
+@swag_from({
+    'summary': 'Cadastrar uma nova empresa',
+    'tags': ['Empresas'],
+    'parameters': [
+        {
+            'name': 'empreasa',
+            'description': 'Dados da nova empresa',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'cnpj': {'type': 'string'},
+                    'nome_razao': {'type':'string'},
+                    'nome_fantasia':{'type':'string'},
+                    'cnae':{'type':'string'}
+                }
+            }
+        }
+    ],
+    'responses': {
+        '201': {
+            'description': 'Empresa cadastrada com sucesso',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'mensagem': {'type':'string'}
+                }
+            }
+        },
+        '400': {
+            'description': 'Requisição inválida',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'erro': {'type': 'string'}
+                }
+            }
+        }
+    }
+})
+
 
 
 def cadastrar_empresa():
@@ -52,8 +95,56 @@ def cadastrar_empresa():
     empresas.append(nova_empresa)
     return jsonify({'messagem': 'Empresa cadastrada com sucesso'}), 201
 
+
 #Endpoint para editar uma empresa existente
-@app.route('/empresas/<string:cnpj>', methods=['PUT'])
+@app.route('/empresas/<string:cnpj>/', methods=['PUT'])
+@swag_from({
+    'summary': 'Editar uma empresa exitente',
+    'tags': ['Empresa'],
+    'parameters': [
+        {
+            'name':'cnpj',
+            'description': 'CNPJ da empresa a ser editada',
+            'in': 'patg',
+            'type': 'string',
+            'required': True
+        },
+        {
+            'name': 'empresa',
+            'description': 'Dados da empresa a serem atualizados',
+            'in': 'body',
+            'required': True,
+            'schema': {
+                'type':'object',
+                'properties': {
+                    'nome_fantasia': {'type':'string'},
+                    'cnae': {'type':'string'}
+                }
+            }
+        }
+    ],
+    'respnses': {
+        '200': {
+            'description': 'Empresa editada com sucesso',
+            'schema': {
+                'type':'object',
+                'properties': {
+                    'mensagem': {'type':'string'}
+                }
+            }
+        },
+        '404': {
+            'description':'Empresa não encontrada',
+            'schema': {
+                'type':'object',
+                'properties': {
+                    'erro': {'type':'string'}
+                }
+            }
+        }
+    }
+})
+
 def editar_empresa(cnpj):
     empresa_editada = request.get_json()
     for empresa in empresas:
@@ -67,6 +158,41 @@ def editar_empresa(cnpj):
 
 #Endpoint para remover uma empresa existente
 @app.route('/empresas/<string:cnpj>', methods=['DELETE'])
+
+@swag_from({
+    'summary': 'Remover uma empresa existente',
+    'tags': ['Empresas'],
+    'parameters': [
+        {
+            'name': 'cnpj',
+            'description': 'CNPJ da empresa a ser removida',
+            'in': 'path',
+            'type': 'string',
+            'required': True
+        }
+    ],
+    'responses': {
+        '200': {
+            'description':'Empresas removida com sucesso',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'mensagem':{'type':'string'}
+                }
+            }
+        },
+        '404': {
+            'description': 'Empresa não encontrada',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'erro': {'type':'string'}
+                }
+            }
+        }
+    }  
+})
+
 def remover_empresa(cnpj):
     for empresa in empresas:
         if empresa['cnpj'] == cnpj:
@@ -76,6 +202,58 @@ def remover_empresa(cnpj):
 
 #Endpoint de listagem e empresas para paginação, ordenação e limite
 @app.route('/empresas/', methods=['GET'])
+@swag_from({
+    'summary': 'Listar empresas',
+    'tags': ['Empresas'],
+    'parameters':[
+        {
+            'name': 'start',
+            'description': 'Indice de início para a paginação',
+            'in': 'query',
+            'type': 'integer',
+            'default': 0
+        },
+        {
+            'name': 'limit',
+            'description': 'Número máximo de registros por página',
+            'in': 'query',
+            'type': 'integer',
+            'default': 10
+        },
+        {
+            'name': 'sort',
+            'description': 'Campo para ordenação (cnpj, nome_razao, nome_fantasia, cnae)',
+            'in':'query',
+            'type': 'string',
+            'default': 'cnpj'
+        },
+        {
+            'name': 'dir',
+            'description': 'Direção da ordenação (asc ou desc)',
+            'in': 'query',
+            'type':'string',
+            'default': 'asc'
+        }
+    ],
+    'responses': {
+        '200':{
+            'description':'Lista de empresas',
+            'schema': {
+                'type': 'array',
+                'items': {
+                    'type':' object',
+                    'properties': {
+                        'cnpj': {'type': 'string'},
+                        'nome_razao': {'type':'string'},
+                        'nome_fantasia': {'type':'string'},
+                        'cnae': {'type':'string'}
+                    }
+                }
+            }
+        }
+    }
+})
+
 def listar_empresas():
     start = int(request.args.get('start', 0))
     limit = int(request.args.get('limit', 10))
