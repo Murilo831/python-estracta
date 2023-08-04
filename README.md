@@ -17,9 +17,15 @@ A <strong>tabela exibe dados fictícios gerados dinamicamente</strong> com a aju
 - [x] 5. dados das empresas armazenados em memória
 
 ## Dicas do projeto
-- [x] 1. Framwork Flask
+- [x] 1. Framework Flask
 - [x] 2. Listagem Paginada (start, limit, sort e dir)
 - [x] 3. Endpoint documentado com referencia o Swagger
+
+## Bonus
+
+- [x] 1. Validação CNPJ valido
+- [ ] 2. Autenticação aos endpoints
+- [ ] 3. DB para armazenar os dados
 
 ## Tecnologias usadas
 

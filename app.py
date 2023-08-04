@@ -41,6 +41,41 @@ empresas = [
     # Mais empresas aqui...
 ]
 
+# Validação do formato do CNPJ
+def is_valid_cnpj(cnpj):
+    # Remover caracteres não numéricos do CNPJ
+    cnpj = ''.join(filter(str.isdigit, cnpj))
+
+    # Verificar se o CNPJ tem 14 digitos
+    if len(cnpj) != 14:
+        return False
+    
+    # Verificar se todos os digitos são iguais (CNPJs inválidos)
+    if cnpj == cnpj[0] * 14:
+        return False
+
+    # Cálculo do primeiro digito verificador
+    soma = 0
+    peso = 5
+    for i in range(12):
+        soma += int(cnpj[i]) * peso
+        peso = 9 if peso == 2 else peso - 1
+    primeiro_digito = 11 - (soma % 11) if soma % 11 > 1 else 0
+
+    # Cálculo do segundo digito verificador
+    soma = 0
+    peso = 6
+    for i in range(13):
+        soma += int(cnpj[i]) * peso
+        peso = 9 if peso == 2 else peso - 1 
+    segundo_digito = 11 - (soma % 11) if soma % 11 > 1 else 0
+
+    # Verificar se os digitos verificadores calculados batema com o fornecidos
+    if int(cnpj[12]) != primeiro_digito or int(cnpj[13]) != segundo_digito:
+        return False
+    
+    return True
+
 #Endpoint para cadastrar uma nova empresa
 @app.route('/empresas/', methods=['POST'])
 @swag_from({
@@ -91,6 +126,10 @@ def cadastrar_empresa():
     nova_empresa = request.get_json()
     if 'cnpj' not in nova_empresa or 'name_razao' not in nova_empresa or 'nome_fantasia' not in nova_empresa or 'cnae' not in nova_empresa:
         return jsonify({'erro': 'Os campos CNPJ, Nome Razão, Nome Fantasia  e CNAE são obrigatórios'}), 400
+
+    # Validar o formato do CNPJ antes de salvar a empresa
+    if not is_valid_cnpj(nova_empresa['cnpj']):
+        return jsonify({'erro': 'CNPJ invalido'}), 400
 
     empresas.append(nova_empresa)
     return jsonify({'messagem': 'Empresa cadastrada com sucesso'}), 201
