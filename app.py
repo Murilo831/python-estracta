@@ -1,8 +1,12 @@
 from flasgger import Swagger
 from flasgger import swag_from
+
 from flask import Flask, request, jsonify
 
+
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'super-secret'
+
 
 # Configuração do Swagger
 template = {
@@ -38,7 +42,6 @@ empresas = [
         "nome_fantasia": "Empre2",
         "cnae": "5678-9/00"
     },
-    # Mais empresas aqui...
 ]
 
 # Validação do formato do CNPJ
@@ -78,6 +81,7 @@ def is_valid_cnpj(cnpj):
 
 #Endpoint para cadastrar uma nova empresa
 @app.route('/empresas/', methods=['POST'])
+
 @swag_from({
     'summary': 'Cadastrar uma nova empresa',
     'tags': ['Empresas'],
@@ -120,23 +124,22 @@ def is_valid_cnpj(cnpj):
     }
 })
 
-
-
 def cadastrar_empresa():
     nova_empresa = request.get_json()
-    if 'cnpj' not in nova_empresa or 'name_razao' not in nova_empresa or 'nome_fantasia' not in nova_empresa or 'cnae' not in nova_empresa:
-        return jsonify({'erro': 'Os campos CNPJ, Nome Razão, Nome Fantasia  e CNAE são obrigatórios'}), 400
-
+    if "cnpj" not in nova_empresa or "nome_razao" not in nova_empresa or "nome_fantasia" not in nova_empresa or "cnae" not in nova_empresa:
+        return jsonify({"erro": "Os campos CNPJ, Nome Razão, Nome Fantasia e CNAE são obrigatórios"}), 400
+    
     # Validar o formato do CNPJ antes de salvar a empresa
     if not is_valid_cnpj(nova_empresa['cnpj']):
-        return jsonify({'erro': 'CNPJ invalido'}), 400
+        return jsonify({"erro": "CNPJ inválido"}), 400
 
     empresas.append(nova_empresa)
-    return jsonify({'messagem': 'Empresa cadastrada com sucesso'}), 201
+    return jsonify({"mensagem": "Empresa cadastrada com sucesso"}), 201
 
 
 #Endpoint para editar uma empresa existente
 @app.route('/empresas/<string:cnpj>/', methods=['PUT'])
+
 @swag_from({
     'summary': 'Editar uma empresa exitente',
     'tags': ['Empresa'],
@@ -162,7 +165,7 @@ def cadastrar_empresa():
             }
         }
     ],
-    'respnses': {
+    'responses': {
         '200': {
             'description': 'Empresa editada com sucesso',
             'schema': {
@@ -192,8 +195,13 @@ def editar_empresa(cnpj):
                 empresa['nome_fantasia'] = empresa_editada['nome_fantasia']
             if 'cnae' in empresa_editada:
                 empresa['cnae'] = empresa_editada['cnae']
-            return jsonify({'mensagem': 'Empresa editada com sucesso'}), 200
+                return jsonify({'mensagem': 'Empresa editada com sucesso'}), 200
+        
     return jsonify({'erro': 'Empresa não encontrada'}), 404
+    
+
+
+
 
 #Endpoint para remover uma empresa existente
 @app.route('/empresas/<string:cnpj>', methods=['DELETE'])
@@ -239,8 +247,10 @@ def remover_empresa(cnpj):
             return jsonify({'mensagem': 'Empresa removida com sucesso'}), 200
     return jsonify({'erro': 'Empresa não encontrada'}), 404
 
+
 #Endpoint de listagem e empresas para paginação, ordenação e limite
 @app.route('/empresas/', methods=['GET'])
+
 @swag_from({
     'summary': 'Listar empresas',
     'tags': ['Empresas'],
@@ -292,6 +302,8 @@ def remover_empresa(cnpj):
         }
     }
 })
+
+
 
 def listar_empresas():
     start = int(request.args.get('start', 0))
