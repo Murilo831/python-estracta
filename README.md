@@ -24,8 +24,6 @@ A <strong>tabela exibe dados fictícios gerados dinamicamente</strong> com a aju
 ## Bonus
 
 - [x] 1. Validação CNPJ valido
-- [ ] 2. Autenticação aos endpoints
-- [ ] 3. DB para armazenar os dados
 
 ## Tecnologias usadas
 
