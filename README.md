@@ -21,7 +21,9 @@ Certifique-se de ter as seguintes ferramentas instaladas:
 
    ```bash
    git clone https://github.com/Murilo831/python-estracta.git
-
+   pip install -r requirements.txt
+   python app.py	
+	
 ## Informação de Func
 
 - [x] 1. Endpoint para cadastrar nova empresa
